@@ -1,0 +1,5 @@
+{
+  "name": "JewelCost AI",
+  "description": "A dynamic costing system for imitation jewelry businesses. Manage components, build product recipes (BOM), and automatically recalculate product costs when raw material prices change. Includes AI-powered cost analysis.",
+  "requestFramePermissions": []
+}
