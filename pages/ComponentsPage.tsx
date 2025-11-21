@@ -16,19 +16,33 @@ export const ComponentsPage: React.FC<ComponentsPageProps> = ({ components, setC
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAdd = async () => {
-    if (!newComponent.name || !newComponent.price) return;
+    if (!newComponent.name) {
+        alert("Please enter a component name.");
+        return;
+    }
+
+    // Robust ID generation that works in all environments
+    const id = (typeof crypto !== 'undefined' && crypto.randomUUID) 
+        ? crypto.randomUUID() 
+        : Date.now().toString(36) + Math.random().toString(36).substring(2);
+
     const component: Component = {
-      id: crypto.randomUUID(),
+      id: id,
       name: newComponent.name,
-      price: Number(newComponent.price),
+      price: Number(newComponent.price) || 0,
       unit: newComponent.unit || 'pcs',
       category: newComponent.category || 'General',
     };
     
-    // Use Data Service
-    await dataService.addComponent(component);
-    setComponents([...components, component]);
-    setNewComponent({ name: '', price: 0, unit: 'pcs', category: 'General' });
+    try {
+        // Use Data Service
+        await dataService.addComponent(component);
+        setComponents([...components, component]);
+        setNewComponent({ name: '', price: 0, unit: 'pcs', category: 'General' });
+    } catch (error) {
+        console.error("Failed to add component:", error);
+        alert("Error saving component. Please try again.");
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -117,7 +131,7 @@ export const ComponentsPage: React.FC<ComponentsPageProps> = ({ components, setC
             <label className="block text-sm font-medium text-slate-700 mb-1">Price (₹)</label>
             <input 
               type="number" 
-              value={newComponent.price || ''}
+              value={newComponent.price === 0 ? '' : newComponent.price}
               onChange={e => setNewComponent({...newComponent, price: Number(e.target.value)})}
               className="w-full p-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-slate-900"
               placeholder="0.00"
